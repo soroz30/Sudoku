@@ -1,0 +1,20 @@
+button {
+  background: #854B97;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  height: 30px;
+  margin: 0 40px 30px;
+  width: 100px;
+  transition: 2s;
+}
+
+.correct {
+  background: #00FF48;
+  transition: 1s;
+}
+
+.wrong {
+  background: #FF0000;
+  transition: 1s;
+}
