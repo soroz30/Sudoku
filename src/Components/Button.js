@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import './Button.css';
+import '../Styles/Button.css';
 
 class Button extends Component {
   state = {
-    className: ''
+    className: '',
   }
 
   handleClick = () => {
@@ -22,10 +21,11 @@ class Button extends Component {
   render() {
     return (
       <button 
-        className={`${this.state.className} ${this.props.upperButton}`}
+        className={`${this.state.className}`}
         onClick={this.props.onClick ? this.props.onClick : this.handleClick}
+        disabled={this.props.disabled}
       >{this.props.value}</button>
-    )
+    );
   }
 }
 

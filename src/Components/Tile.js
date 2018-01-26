@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Tile.css';
+import '../Styles/Tile.css';
 
 import ReactDOM from 'react-dom';
 

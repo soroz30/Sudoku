@@ -1,0 +1,31 @@
+.input {
+  color: #FF0000;
+  flex: 1 1 11%;
+  font-size: 20px;
+  height: 50px;
+  width: 50px;
+  transition: 0.25s;
+}
+
+.active {
+  background: #FF0000;
+  border: none;
+  color: #fff;
+  transition: 0.25s;
+}
+
+.targeted {
+  background: #B20000;
+  border: none;
+  color: #fff;
+  transition: 0.25s;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+ -moz-appearance: textfield;
+}

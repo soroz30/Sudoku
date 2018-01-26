@@ -1,0 +1,28 @@
+* {
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.board-container {
+  align-items: center;
+  display: flex;
+  width: 800px;
+  margin: 0 auto;
+}
+
+.buttons {
+  position: relative;
+  width: 900px;
+  margin: 0 auto;
+}
+
+.hide-container {
+  position: relative;
+}
+
+span {
+  margin: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+}

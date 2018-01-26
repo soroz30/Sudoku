@@ -1,28 +1,37 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-import Board from './Board';
-import Button from './Button'
+import './Styles/App.css';
+import Board from './Components/Board';
+import Button from './Components/Button';
+import LoadGame from './Components/LoadGame';
+import ButtonsGroup from './Components/ButtonsGroup';
+import DifficultyButtons from './Components/DifficultyButtons';
 import sudoku from 'sudoku-umd';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
+import Animate from 'react-move/Animate';
 
 class App extends Component {
   state = {
     initialBoard: '',
     board: [...Array(81)].map((_, index) => {
-      return { value: '.', index } 
+      return { value: '.', index };
     }),
     previousBoards: [],
     activeLine: {},
     difficultyOpen: false,
     wrongInputs: false,
-    flowButtons: false,
     currentIterator: 0,
     copied: false,
+    loadGame: false,
   }
 
   componentWillUpdate(nextProps, nextState) {
-    localStorage.setItem('sudoku', JSON.stringify(nextState));
+    localStorage.setItem('sudoku', JSON.stringify({
+      ...nextState,
+      copied: false,
+      loadGame: false,
+      activeLine: {},
+      difficultyOpen: false,
+      wrongInputs: false,
+    }));
   }
 
   componentWillMount() {
@@ -44,13 +53,8 @@ class App extends Component {
     }
   }
 
-  newGame = (difficulty) => {
-    let newBoard = sudoku.generate(difficulty).split('').map((value, index) => {
-      const row = Math.floor(index / 9);
-      const column = index % 9;
-
-      return {value, index, row, column}
-    });
+  newGame = (difficulty, loadData) => {
+    let newBoard = this.createNewBoard(difficulty, loadData);
     this.fillBoardWithBlockData(newBoard);
     this.setState({
       ...this.state,
@@ -58,9 +62,38 @@ class App extends Component {
       previousBoards: [newBoard],
       board: newBoard,
       difficultyOpen: false,
-      flowButtons: true,
+      loadGame: false,
       currentIterator: 0,
     });
+  }
+
+  createNewBoard = (difficulty, loadData) => {
+    if (difficulty) {
+      return this.generateNewSudoku(difficulty);
+    } else {
+      return this.generateFromLoad(loadData);
+    }
+  }
+
+  generateNewSudoku = (difficulty) => {
+    return this.generateSudoku(sudoku.generate(difficulty));
+  }
+
+  generateFromLoad = (loadData) => {
+    return this.generateSudoku(loadData);
+  }
+
+  generateSudoku = (sudokuString) => {
+    return sudokuString.split('').map((value, index) => {
+      const row = Math.floor(index / 9);
+      const column = index % 9;
+
+      return {value, index, row, column};
+    });
+  }
+
+  processGame = (event) => {
+    this.newGame(event.target.innerText.toLowerCase());
   }
 
   restart = () => {
@@ -68,56 +101,10 @@ class App extends Component {
       this.setState({
         ...this.state,
         board: this.state.initialBoard,
-        flowButtons: true,
+        difficultyOpen: false,
+        loadGame: false,
       });
     }
-  }
-
-  checkSudoku = () => {
-    //spytac sie co zrobic kiedy wywala error jak plansza jest pusta
-    const actualSudoku = this.state.board.map(field => field.value).join('');
-    return sudoku.solve(actualSudoku);
-  }
-
-  solve = () => {
-    let solvedSudoku = this.checkSudoku();
-    if (solvedSudoku) {
-      let solvedBoard = [...this.state.board];
-      solvedSudoku.split('').forEach((value, index) => {
-        solvedBoard[index] = Object.assign({}, solvedBoard[index], {
-                                value,
-                              })
-      });
-      this.setState({
-        ...this.state,
-        board: solvedBoard,
-        flowButtons: false,
-      });
-      return true;
-    } else {
-      this.showAndHideWrongInputs();
-    }
-  }
-
-  check = () => {
-    if (this.checkSudoku()) {
-      return true
-    } else {
-      this.showAndHideWrongInputs();
-    }
-  }
-
-  showAndHideWrongInputs = () => {
-    this.setState({
-      ...this.state,
-      wrongInputs: true,
-    });
-    setTimeout(() => {
-      this.setState({
-        ...this.state,
-        wrongInputs: false
-      });
-    }, 1250)
   }
 
   changeBoard = (attrs) => {
@@ -131,6 +118,8 @@ class App extends Component {
       ...this.state,
       board: newBoard,
       previousBoards: [newBoard,...previousBoards],
+      difficultyOpen: false,
+      loadGame: false,
       currentIterator: 0,
     });
   }
@@ -147,6 +136,8 @@ class App extends Component {
   changeActiveLines = (active) => {
     this.setState({
       ...this.state,
+      difficultyOpen: false,
+      loadGame: false,
       activeLine: {
         row: active.row,
         column: active.column,
@@ -159,12 +150,10 @@ class App extends Component {
     this.setState({
       ...this.state,
       difficultyOpen: true,
-      flowButtons: false,
-    })
-  }
-
-  processGame = (event) => {
-    this.newGame(event.target.innerText.toLowerCase());
+      loadGame: false,
+      copied: false,
+      wrongInputs: false,
+    });
   }
 
   undo = () => {
@@ -175,6 +164,8 @@ class App extends Component {
         ...this.state,
         board: previousBoard,
         currentIterator: currentIterator,
+        difficultyOpen: false,
+        loadGame: false,
       });
     }
   }
@@ -187,91 +178,187 @@ class App extends Component {
         ...this.state,
         board: nextBoard,
         currentIterator: currentIterator,
-      })
+        difficultyOpen: false,
+        loadGame: false,
+      });
     }
+  }
+
+  checkSudoku = () => {
+    //Co zrobic kiedy wywala error jak plansza jest pusta
+    const sudokuBoard = this.state.board.map(field => field.value).join('');
+    return sudoku.solve(sudokuBoard);
+  }
+
+  solve = () => {
+    let solvedSudoku = this.checkSudoku();
+    if (solvedSudoku) {
+      let solvedBoard = [...this.state.board];
+      solvedSudoku.split('').forEach((value, index) => {
+        solvedBoard[index] = Object.assign({}, solvedBoard[index], {
+                               value,
+                             });
+      });
+      this.setState({
+        ...this.state,
+        board: solvedBoard,
+        difficultyOpen: false,
+        loadGame: false,
+      });
+      return true;
+    } else {
+      this.showAndHideInputsWarning();
+    }
+  }
+
+  check = () => {
+    if (this.checkSudoku()) {
+      this.hideButtons();
+      return true
+    } else {
+      this.showAndHideInputsWarning();
+    }
+  }
+
+  hideButtons = () => {
+    this.setState({
+      ...this.state,
+      difficultyOpen: false,
+      loadGame: false,
+    });
+  }
+
+  showAndHideInputsWarning = () => {
+    this.setState({
+      ...this.state,
+      wrongInputs: true,
+      difficultyOpen: false,
+      loadGame: false,
+      copied: false,
+    });
+    setTimeout(() => {
+      this.setState({
+        ...this.state,
+        wrongInputs: false,
+      });
+    }, 2000);
   }
 
   copied = () => {
     this.setState({
       ...this.state,
       copied: true,
+      difficultyOpen: false,
+      wrongInputs: false,
+      loadGame: false,
     });
     setTimeout(() => {
       this.setState({
         ...this.state,
         copied: false,
       })
-    }, 2000);
+    }, 1500);
+  }
+
+  loadGame = () => {
+    this.setState({
+      ...this.state,
+      loadGame: true,
+      difficultyOpen: false,
+      copied: false,
+      wrongInputs: false,
+    });
   }
 
   render() {
+    const animateProps = {
+            start: { opacity: 0 },
+            enter: {
+              opacity: [1],
+              timing: { duration: 750 },
+            },
+            leave: {
+              opacity: [0],
+              timing: { duration: 250 },
+            }
+          };
     return (
       <div className='App'>
         <h1>Sudoku</h1>
-        <Board 
-          board={this.state.board}
-          changeBoard={this.changeBoard}
-          activeLine={this.state.activeLine}
-          changeActiveLines={this.changeActiveLines}
-        />
-          <div className='buttons'>
-            <div className={this.state.flowButtons ? 'show' : 'hide'}>
-                <Button 
-                   sudokuFunction={this.check}
-                   value={'Check'}
-                />
-                <Button
-                  onClick={this.undo}
-                  value={'Undo'}
-                  upperButton={'upperButton'}
-                />
-                <Button
-                  onClick={this.redo}
-                  value={'Redo'}
-                  upperButton={'upperButton'}
-                />
-                <CopyToClipboard 
-                  text={this.state.board.map(tile => tile.value).join('')}
-                  onCopy={this.copied}>
-                  <Button
-                    value={'Copy state'}
-                    upperButton={'upperButton'}
-                  />
-                </CopyToClipboard>
-            </div>
-            {this.state.copied ?  <span className="copied">Copied!</span> : null}
+
+          <div className='board-container'>
             <Button
-              onClick={this.showDifficulty}
-              value={'New Game'}
+              onClick={this.undo}
+              value={'Undo'}
+            />
+            <Board 
+              board={this.state.board}
+              changeBoard={this.changeBoard}
+              activeLine={this.state.activeLine}
+              changeActiveLines={this.changeActiveLines}
             />
             <Button
-              onClick={this.loadState}
-              value={'Load State'}
+              onClick={this.redo}
+              value={'Redo'}
             />
-            <Button
-              sudokuFunction={this.solve}
-              value={'Solve'}
-            />
-            <Button
-              onClick={this.restart}
-              value={'Restart'}
-            />
-        </div>
-        <p className={this.state.wrongInputs ? 'show' : 'hide'}>There are wrong inputs on Sudoku</p>
-        <div className={this.state.difficultyOpen ? 'show' : 'hide'}>
-          <Button 
-            onClick={this.processGame}
-            value={'Easy'}
+          </div>
+          
+          <ButtonsGroup 
+            showDifficulty={this.showDifficulty}
+            loadGame={this.loadGame}
+            board={this.state.board}
+            onCopy={this.copied}
+            check={this.check}
+            solve={this.solve}
+            restart={this.restart}
           />
-          <Button 
-            onClick={this.processGame}
-            value={'Medium'}
-          />
-          <Button
-            onClick={this.processGame}
-            value={'Hard'}
-          />
-        </div>
+
+          <div class="hide-container">
+            <Animate
+              show={this.state.difficultyOpen}
+              {...animateProps}
+            >
+              {({ opacity }) => {
+                return (
+                  <div style={{opacity}}>
+                    <DifficultyButtons 
+                      processGame={this.processGame}
+                      disabled={!this.state.difficultyOpen}  
+                      animateProps={animateProps}
+                    />
+                  </div>
+                )
+              }}
+            </Animate>
+            <Animate
+              show={this.state.loadGame}
+              {...animateProps}
+            >
+              {({ opacity }) => {
+                return (
+                  <div style={{opacity}}>
+                    <LoadGame 
+                      disabled={!this.state.loadGame}
+                      newGame={this.newGame}
+                      animateProps={animateProps}
+                    />
+                  </div>
+                )
+              }}
+            </Animate>
+            <Animate
+              show={this.state.copied}
+              {...animateProps}
+            >
+              {({ opacity }) => <span style={{opacity}}>Copied!</span>}
+            </Animate>
+            <Animate
+              show={this.state.wrongInputs}
+              {...animateProps}
+            >
+              {({ opacity }) => <span style={{opacity}}>There are wrong inputs on Sudoku</span>}
+            </Animate>
+          </div>
       </div>
     );
   }

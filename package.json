@@ -5,9 +5,12 @@
   "dependencies": {
     "lodash": "^4.17.4",
     "react": "^16.2.0",
+    "react-addons-transition-group": "^15.6.2",
     "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^16.2.0",
+    "react-move": "^2.6.0",
     "react-scripts": "1.1.0",
+    "react-transition-group": "^1.2.1",
     "sudoku-umd": "^1.0.1"
   },
   "scripts": {

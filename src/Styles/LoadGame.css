@@ -1,0 +1,25 @@
+.load-game {
+  position: absolute;
+  right: 0;
+  left: 0;
+}
+
+.load-input {
+  border: none;
+  border: 1px solid #ccc;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  text-align: left;
+  height: 30px;
+  margin: 0 0 10px;
+  padding: 2px 5px;
+}
+
+.load-submit {
+  background: #854B97;
+  border: none;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  color: #fff;
+  height: 30px;	
+}

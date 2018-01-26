@@ -1,18 +1,19 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Tile from './Tile';
-import './Board.css';
+import '../Styles/Board.css';
+import '../Styles/App.css';
 import pick from 'lodash/pick';
 
 const checkPosition = (position, activeLine) => {
   const checkIfActive = Object.keys(position).some(pos => {
-    return position[pos] === activeLine[pos]
+    return position[pos] === activeLine[pos];
   })
   if (!checkIfActive) { return; }
   if (position.row === activeLine.row 
-      && position.column === activeLine.column) {
-      return 'targeted';
+    && position.column === activeLine.column) {
+    return 'targeted';
   } else {
-      return 'active';
+    return 'active';
   }
 }
 
@@ -33,7 +34,7 @@ const Board = ({ board, changeBoard, changeActiveLines, activeLine }) => {
               />
       })}
       </div>
-  )
+  );
 }
 
 export default Board;
