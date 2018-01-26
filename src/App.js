@@ -313,7 +313,7 @@ class App extends Component {
             restart={this.restart}
           />
 
-          <div class="hide-container">
+          <div className="hide-container">
             <Animate
               show={this.state.difficultyOpen}
               {...animateProps}
