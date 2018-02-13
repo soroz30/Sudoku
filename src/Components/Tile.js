@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import '../Styles/Tile.css';
-
 import ReactDOM from 'react-dom';
+import '../Styles/Tile.css';
 
 class Tile extends Component {
   state = {

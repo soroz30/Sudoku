@@ -9,7 +9,7 @@ const checkPosition = (position, activeLine) => {
     return position[pos] === activeLine[pos];
   })
   if (!checkIfActive) { return; }
-  if (position.row === activeLine.row 
+  if (position.row === activeLine.row
     && position.column === activeLine.column) {
     return 'targeted';
   } else {

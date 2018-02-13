@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './Styles/App.css';
 import Board from './Components/Board';
 import Button from './Components/Button';
 import LoadGame from './Components/LoadGame';
@@ -7,6 +6,7 @@ import ButtonsGroup from './Components/ButtonsGroup';
 import DifficultyButtons from './Components/DifficultyButtons';
 import sudoku from 'sudoku-umd';
 import Animate from 'react-move/Animate';
+import findKey from 'lodash/findKey';
 
 class App extends Component {
   state = {
@@ -21,9 +21,17 @@ class App extends Component {
     currentIterator: 0,
     copied: false,
     loadGame: false,
+    correct: false,
+    undo: false,
+    redo: false,
   }
 
   componentWillUpdate(nextProps, nextState) {
+    this.loadStorage(nextState);
+    this.changeBackground(nextState);
+  }
+
+  loadStorage = (nextState) => {
     localStorage.setItem('sudoku', JSON.stringify({
       ...nextState,
       copied: false,
@@ -32,6 +40,22 @@ class App extends Component {
       difficultyOpen: false,
       wrongInputs: false,
     }));
+  }
+
+  changeBackground = (nextState) => {
+    let className;
+    if (this.checkWin(nextState)) {
+      className = 'winner';
+    } else {
+      const activeClass = findKey(nextState, (key) => key === true);
+      className = activeClass && activeClass.match(/^[^f][a-z]+/);
+    }
+    className ? document.body.className = className : document.body.removeAttribute('class');
+  }
+
+  checkWin = (nextState) => {
+    return nextState.board.filter(tile => tile.value === '.').length === 0 &&
+      this.checkSudoku(nextState.board);
   }
 
   componentWillMount() {
@@ -101,6 +125,7 @@ class App extends Component {
       this.setState({
         ...this.state,
         board: this.state.initialBoard,
+        previousBoards: [this.state.initialBoard],
         difficultyOpen: false,
         loadGame: false,
       });
@@ -166,7 +191,14 @@ class App extends Component {
         currentIterator: currentIterator,
         difficultyOpen: false,
         loadGame: false,
+        undo: true,
       });
+      setTimeout(() => {
+        this.setState({
+          ...this.state,
+          undo: false,
+        });
+      }, 1000);
     }
   }
 
@@ -180,13 +212,23 @@ class App extends Component {
         currentIterator: currentIterator,
         difficultyOpen: false,
         loadGame: false,
+        redo: true,
       });
+      setTimeout(() => {
+        this.setState({
+          ...this.state,
+          redo: false,
+        });
+      }, 1000);
     }
   }
 
-  checkSudoku = () => {
+  checkSudoku = (board) => {
     //Co zrobic kiedy wywala error jak plansza jest pusta
-    const sudokuBoard = this.state.board.map(field => field.value).join('');
+    if (!board) {
+      board = this.state.board;
+    }
+    const sudokuBoard = board.map(field => field.value).join('');
     return sudoku.solve(sudokuBoard);
   }
 
@@ -205,7 +247,6 @@ class App extends Component {
         difficultyOpen: false,
         loadGame: false,
       });
-      return true;
     } else {
       this.showAndHideInputsWarning();
     }
@@ -213,19 +254,25 @@ class App extends Component {
 
   check = () => {
     if (this.checkSudoku()) {
-      this.hideButtons();
-      return true
+      this.showCorrect();
     } else {
       this.showAndHideInputsWarning();
     }
   }
 
-  hideButtons = () => {
+  showCorrect = () => {
     this.setState({
       ...this.state,
+      correct: true,
       difficultyOpen: false,
       loadGame: false,
     });
+    setTimeout(() => {
+      this.setState({
+        ...this.state,
+        correct: false,
+      });
+    }, 2000);
   }
 
   showAndHideInputsWarning = () => {
@@ -303,7 +350,7 @@ class App extends Component {
             />
           </div>
           
-          <ButtonsGroup 
+          <ButtonsGroup
             showDifficulty={this.showDifficulty}
             loadGame={this.loadGame}
             board={this.state.board}
@@ -323,7 +370,7 @@ class App extends Component {
                   <div style={{opacity}}>
                     <DifficultyButtons 
                       processGame={this.processGame}
-                      disabled={!this.state.difficultyOpen}  
+                      disabled={!this.state.difficultyOpen}
                       animateProps={animateProps}
                     />
                   </div>

@@ -21,11 +21,11 @@ const ButtonsGroup = (props) => {
         />
       </CopyToClipboard>
       <Button 
-        sudokuFunction={props.check}
+        onClick={props.check}
         value={'Check'}
       />
       <Button
-        sudokuFunction={props.solve}
+        onClick={props.solve}
         value={'Solve'}
       />
       <Button
