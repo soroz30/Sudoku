@@ -40,7 +40,7 @@ class Tile extends Component {
   render() {
     return(
       <input
-        className={`input ${this.props.tileClass}`}
+        className={`input ${this.props.tileClass || ''}`}
         type='number'
         onChange={this.handleTileChange}
         onKeyDown={this.handleAccept}

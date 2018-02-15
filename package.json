@@ -4,7 +4,11 @@
   "private": true,
   "homepage": "https://soroz30.github.io/Sudoku",
   "dependencies": {
+    "autoprefixer": "^8.0.0",
     "lodash": "^4.17.4",
+    "npx": "^9.7.1",
+    "postcss": "^6.0.18",
+    "postcss-cli": "^5.0.0",
     "react": "^16.2.0",
     "react-addons-transition-group": "^15.6.2",
     "react-copy-to-clipboard": "^5.0.1",
@@ -16,6 +20,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "autoprefix": "postcss ./src/Styles/*.css --use autoprefixer -r",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",

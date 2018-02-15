@@ -1,9 +1,10 @@
 .input {
   color: #000;
-  flex: 1 1 11%;
   font-size: 20px;
   height: 50px;
-  width: 50px;
+  width: 11%;
+  -webkit-transition: 0.25s;
+  -o-transition: 0.25s;
   transition: 0.25s;
 }
 
@@ -11,6 +12,8 @@
   background: rgba(0, 0, 0, 0.5);
   border: none;
   color: #fff;
+  -webkit-transition: 0.25s;
+  -o-transition: 0.25s;
   transition: 0.25s;
 }
 
@@ -18,6 +21,8 @@
   background: rgba(80, 150, 121, 0.5);
   border: none;
   color: #fff;
+  -webkit-transition: 0.25s;
+  -o-transition: 0.25s;
   transition: 0.25s;
 }
 

@@ -6,10 +6,14 @@ button {
   height: 30px;
   margin: 0 20px 30px;
   width: 100px;
+  -webkit-transition: background 0.5s;
+  -o-transition: background 0.5s;
   transition: background 0.5s;
 }
 
 button:hover {
   background: #204938;
+  -webkit-transition: background 0.5s;
+  -o-transition: background 0.5s;
   transition: background 0.5s;
 }
